@@ -1,0 +1,27 @@
+# tests/test_models.py
+
+from django.test import TestCase
+from myapp.models import Product  # Adjust this import to your actual Product model
+from tests.factories import ProductFactory
+
+class ProductModelTest(TestCase):
+    def setUp(self):
+        # Create a product instance using the factory
+        self.product = ProductFactory()
+
+    def test_update_product(self):
+        # Update product attributes
+        self.product.name = "Updated Product Name"
+        self.product.description = "Updated Product Description"
+        self.product.price = 199.99
+        self.product.stock = 50
+        self.product.save()
+
+        # Fetch the updated product from the database
+        updated_product = Product.objects.get(id=self.product.id)
+
+        # Assert that the fetched product matches the updated values
+        self.assertEqual(updated_product.name, "Updated Product Name")
+        self.assertEqual(updated_product.description, "Updated Product Description")
+        self.assertEqual(updated_product.price, 199.99)
+        self.assertEqual(updated_product.stock, 50)
