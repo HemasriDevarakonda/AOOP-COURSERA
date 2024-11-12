@@ -1,0 +1,6 @@
+@then('I should see "{text}" on the page')
+def step_impl(context, text):
+    """
+    Step definition to verify that specific text is present on the page.
+    """
+    assert text in context.browser.page_source, f"Expected text '{text}' not found on the page"
