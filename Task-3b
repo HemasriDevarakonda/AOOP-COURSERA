@@ -1,0 +1,39 @@
+# tests/test_routes.py
+
+from rest_framework import status
+from rest_framework.test import APITestCase
+from myapp.models import Product  # Adjust to your actual models
+from tests.factories import ProductFactory
+
+class ProductRoutesTest(APITestCase):
+    def setUp(self):
+        # Create a product instance using the factory
+        self.product = ProductFactory(name="Old Product", description="Old Description", price=100.0)
+        self.url = f'/api/products/{self.product.id}/'  # Adjust to your actual URL pattern for updating a product
+
+    def test_update_product(self):
+        # Prepare the updated data
+        updated_data = {
+            'name': 'Updated Product',
+            'description': 'Updated Description',
+            'price': 150.0
+        }
+
+        # Send a PUT request to update the product
+        response = self.client.put(self.url, updated_data, format='json')
+
+        # Check the status code
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Reload the product from the database
+        self.product.refresh_from_db()
+
+        # Verify the product data was updated
+        self.assertEqual(self.product.name, updated_data['name'])
+        self.assertEqual(self.product.description, updated_data['description'])
+        self.assertEqual(self.product.price, updated_data['price'])
+
+        # Optionally, verify the response contains the updated data
+        self.assertEqual(response.data['name'], updated_data['name'])
+        self.assertEqual(response.data['description'], updated_data['description'])
+        self.assertEqual(response.data['price'], str(updated_data['price']))  # Assuming price is returned as a string
