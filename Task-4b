@@ -1,0 +1,26 @@
+# service/routes.py
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from myapp.models import Product  # Adjust to your actual models
+from myapp.serializers import ProductSerializer  # Adjust to your actual serializer
+
+class ProductUpdate(APIView):
+    def put(self, request, pk, format=None):
+        """
+        Update a product's information by its ID.
+        """
+        try:
+            product = Product.objects.get(pk=pk)  # Fetch the product by its ID
+        except Product.DoesNotExist:
+            return Response(
+                {"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND
+            )
+
+        serializer = ProductSerializer(product, data=request.data)  # Pass the existing product and the updated data
+
+        if serializer.is_valid():
+            serializer.save()  # Save the updated product to the database
+            return Response(serializer.data)  # Return the updated product data in the response
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  # Return validation errors if any
