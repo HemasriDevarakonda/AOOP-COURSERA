@@ -1,0 +1,35 @@
+# tests/test_routes.py
+
+from rest_framework import status
+from rest_framework.test import APITestCase
+from myapp.models import Product, Category  # Adjust to your actual models
+from tests.factories import ProductFactory, CategoryFactory
+
+class ProductRoutesTest(APITestCase):
+    def setUp(self):
+        # Create categories
+        category_1 = CategoryFactory(name='Electronics')
+        category_2 = CategoryFactory(name='Clothing')
+        
+        # Create some product instances using the factory, each assigned a category
+        ProductFactory(name='Laptop', category=category_1)
+        ProductFactory(name='Smartphone', category=category_1)
+        ProductFactory(name='T-shirt', category=category_2)
+
+        self.url = '/api/products/?category='  # Adjust to your actual URL pattern for filtering by category
+
+    def test_list_products_by_category(self):
+        # Send a GET request to list products filtered by category 'Electronics'
+        response = self.client.get(self.url + 'Electronics')
+
+        # Check that the status code is 200 OK
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Check that the response contains only products from the 'Electronics' category
+        self.assertEqual(len(response.data), 2)
+        self.assertEqual(response.data[0]['category'], 'Electronics')
+        self.assertEqual(response.data[1]['category'], 'Electronics')
+
+        # Optionally, check that products from the 'Clothing' category are not returned
+        product_categories = [product['category'] for product in response.data]
+        self.assertNotIn('Clothing', product_categories)
