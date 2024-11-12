@@ -1,0 +1,104 @@
+# service/routes.py
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from myapp.models import Product  # Adjust to your actual models
+from myapp.serializers import ProductSerializer  # Adjust to your actual serializer
+
+class ProductList(APIView):
+    """
+    List all products or filter by name, category, or availability.
+    """
+    def get(self, request, format=None):
+        """
+        Retrieve a list of all products, or apply filters for name, category, or availability.
+        """
+        # Get the query parameters for filtering
+        name = request.query_params.get('name', None)
+        category = request.query_params.get('category', None)
+        availability = request.query_params.get('availability', None)
+
+        # Filter products based on the query parameters provided
+        products = Product.objects.all()
+
+        if name:
+            products = products.filter(name__icontains=name)  # Filter by name
+        if category:
+            products = products.filter(category__icontains=category)  # Filter by category
+        if availability:
+            products = products.filter(availability=availability)  # Filter by availability
+
+        # Serialize the data and return it as a response
+        serializer = ProductSerializer(products, many=True)
+        return Response(serializer.data)
+
+
+class ProductListByName(APIView):
+    """
+    List products filtered by name.
+    """
+    def get(self, request, format=None):
+        """
+        Retrieve a list of products filtered by name.
+        """
+        name = request.query_params.get('name', None)
+
+        if not name:
+            return Response(
+                {"detail": "Name parameter is required."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        products = Product.objects.filter(name__icontains=name)  # Filter by name
+        serializer = ProductSerializer(products, many=True)
+        return Response(serializer.data)
+
+
+class ProductListByCategory(APIView):
+    """
+    List products filtered by category.
+    """
+    def get(self, request, format=None):
+        """
+        Retrieve a list of products filtered by category.
+        """
+        category = request.query_params.get('category', None)
+
+        if not category:
+            return Response(
+                {"detail": "Category parameter is required."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        products = Product.objects.filter(category__icontains=category)  # Filter by category
+        serializer = ProductSerializer(products, many=True)
+        return Response(serializer.data)
+
+
+class ProductListByAvailability(APIView):
+    """
+    List products filtered by availability.
+    """
+    def get(self, request, format=None):
+        """
+        Retrieve a list of products filtered by availability.
+        """
+        availability = request.query_params.get('availability', None)
+
+        if not availability:
+            return Response(
+                {"detail": "Availability parameter is required."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Ensure availability is a valid boolean value
+        if availability not in ['True', 'False']:
+            return Response(
+                {"detail": "Invalid availability value. Must be 'True' or 'False'."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        products = Product.objects.filter(availability=availability.lower() == 'true')  # Filter by availability
+        serializer = ProductSerializer(products, many=True)
+        return Response(serializer.data)
