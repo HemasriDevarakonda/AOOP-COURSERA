@@ -1,0 +1,18 @@
+from behave import given, when, then
+from service.models import Product
+
+@given('there are products in the system with different categories')
+def step_impl(context):
+    Product.objects.create(name="Smartphone", category="Electronics", price=299.99, availability=True)
+    Product.objects.create(name="Laptop", category="Electronics", price=999.99, availability=True)
+    Product.objects.create(name="T-shirt", category="Clothing", price=19.99, availability=True)
+    Product.objects.create(name="Refrigerator", category="Home Appliances", price=499.99, availability=True)
+
+@when('I search for products in the "{category}" category')
+def step_impl(context, category):
+    context.products = Product.objects.filter(category=category)
+
+@then('I should see a list of products that belong to the "{category}" category')
+def step_impl(context, category):
+    for product in context.products:
+        assert product.category == category
