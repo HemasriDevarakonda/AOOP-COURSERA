@@ -1,0 +1,22 @@
+# service/routes.py
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from myapp.models import Product  # Adjust to your actual models
+from myapp.serializers import ProductSerializer  # Adjust to your actual serializer
+
+class ProductDetail(APIView):
+    def get(self, request, pk, format=None):
+        """
+        Retrieve a product by its ID.
+        """
+        try:
+            product = Product.objects.get(pk=pk)  # Fetch the product by its primary key (ID)
+        except Product.DoesNotExist:
+            return Response(
+                {"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND
+            )
+
+        serializer = ProductSerializer(product)  # Serialize the product data
+        return Response(serializer.data)  # Return the serialized data in the response
