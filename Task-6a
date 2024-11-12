@@ -1,0 +1,13 @@
+# features/products.feature
+
+Feature: Product Management
+  In order to manage products effectively
+  As an admin user
+  I want to be able to read product details
+
+  Scenario: Successfully reading a product by ID
+    Given there is a product with ID 1 in the system
+    When I retrieve the product with ID 1
+    Then I should see the product's name as "Sample Product"
+    And the product's category should be "Electronics"
+    And the product's availability should be "In Stock"
