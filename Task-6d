@@ -1,0 +1,11 @@
+# features/products.feature
+
+Feature: Product Management
+  As a user
+  I want to view a list of all products
+  So that I can see all the available products in the system
+
+  Scenario: Listing all products
+    Given there are products in the system
+    When I list all products
+    Then I should see a list of all products
