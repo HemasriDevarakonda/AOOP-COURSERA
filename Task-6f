@@ -1,0 +1,30 @@
+# features/products.feature
+
+Feature: Product Management
+  As a user
+  I want to search for products based on their availability
+  So that I can find products that are currently in stock
+
+  Scenario: Searching for available products
+    Given there are products in the system with different availability statuses
+    When I search for products that are "available"
+    Then I should see a list of products that are currently available
+from behave import given, when, then
+from service.models import Product
+
+@given('there are products in the system with different availability statuses')
+def step_impl(context):
+    Product.objects.create(name="Smartphone", category="Electronics", price=299.99, availability=True)
+    Product.objects.create(name="Laptop", category="Electronics", price=999.99, availability=True)
+    Product.objects.create(name="T-shirt", category="Clothing", price=19.99, availability=False)
+    Product.objects.create(name="Refrigerator", category="Home Appliances", price=499.99, availability=False)
+
+@when('I search for products that are "{availability}"')
+def step_impl(context, availability):
+    is_available = availability.lower() == "available"
+    context.products = Product.objects.filter(availability=is_available)
+
+@then('I should see a list of products that are currently available')
+def step_impl(context):
+    for product in context.products:
+        assert product.availability is True
