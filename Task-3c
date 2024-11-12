@@ -1,0 +1,25 @@
+# tests/test_routes.py
+
+from rest_framework import status
+from rest_framework.test import APITestCase
+from myapp.models import Product  # Adjust to your actual models
+from tests.factories import ProductFactory
+
+class ProductRoutesTest(APITestCase):
+    def setUp(self):
+        # Create a product instance using the factory
+        self.product = ProductFactory(name="Product to be deleted", description="To be deleted", price=100.0)
+        self.url = f'/api/products/{self.product.id}/'  # Adjust to your actual URL pattern for deleting a product
+
+    def test_delete_product(self):
+        # Send a DELETE request to delete the product
+        response = self.client.delete(self.url)
+
+        # Check the status code to ensure it's 204 No Content, which means successful deletion with no response body
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        # Attempt to fetch the deleted product
+        response = self.client.get(self.url)
+
+        # Check that the product is no longer available and we get a 404 not found
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
