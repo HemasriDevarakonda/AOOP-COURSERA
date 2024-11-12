@@ -1,0 +1,25 @@
+# tests/test_routes.py
+
+from rest_framework import status
+from rest_framework.test import APITestCase
+from myapp.models import Product  # Adjust to your actual models
+from tests.factories import ProductFactory
+
+class ProductRoutesTest(APITestCase):
+    def setUp(self):
+        # Create a product instance using the factory
+        self.product = ProductFactory(name="Test Product", description="Test Description", price=100.0)
+        self.url = f'/api/products/{self.product.id}/'  # Adjust to your actual URL pattern for reading a product
+
+    def test_read_product(self):
+        # Send a GET request to the product detail endpoint
+        response = self.client.get(self.url)
+
+        # Check the status code
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Verify the returned data matches the product
+        self.assertEqual(response.data['id'], self.product.id)
+        self.assertEqual(response.data['name'], self.product.name)
+        self.assertEqual(response.data['description'], self.product.description)
+        self.assertEqual(response.data['price'], str(self.product.price))  # Assuming price is returned as a string
