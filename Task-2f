@@ -1,0 +1,28 @@
+# tests/test_models.py
+
+from django.test import TestCase
+from myapp.models import Product, Category  # Adjust these imports to your actual models
+from tests.factories import ProductFactory, CategoryFactory
+
+class ProductModelTest(TestCase):
+    def setUp(self):
+        # Create category instances using the factory
+        self.category1 = CategoryFactory(name="Category 1")
+        self.category2 = CategoryFactory(name="Category 2")
+
+        # Create product instances using the factory, assigning them to categories
+        self.product1 = ProductFactory(name="Product 1", category=self.category1)
+        self.product2 = ProductFactory(name="Product 2", category=self.category1)
+        self.product3 = ProductFactory(name="Product 3", category=self.category2)
+
+    def test_find_by_category(self):
+        # Find all products in "Category 1"
+        products_in_category1 = Product.objects.filter(category=self.category1)
+
+        # Check that the correct products are returned
+        self.assertEqual(products_in_category1.count(), 2)
+        self.assertIn(self.product1, products_in_category1)
+        self.assertIn(self.product2, products_in_category1)
+
+        # Check that no products from other categories are returned
+        self.assertNotIn(self.product3, products_in_category1)
