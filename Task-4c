@@ -1,0 +1,23 @@
+# service/routes.py
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from myapp.models import Product  # Adjust to your actual models
+
+class ProductDelete(APIView):
+    def delete(self, request, pk, format=None):
+        """
+        Delete a product by its ID.
+        """
+        try:
+            product = Product.objects.get(pk=pk)  # Try to get the product by its ID
+        except Product.DoesNotExist:
+            return Response(
+                {"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND
+            )
+
+        product.delete()  # Delete the product from the database
+        return Response(
+            {"detail": "Deleted successfully."}, status=status.HTTP_204_NO_CONTENT
+        )
