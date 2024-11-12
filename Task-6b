@@ -1,0 +1,13 @@
+# features/products.feature
+
+Feature: Product Management
+  In order to manage products effectively
+  As an admin user
+  I want to be able to update product details
+
+  Scenario: Successfully updating a product
+    Given a product with ID 1 exists in the system with name "Old Product" and category "Electronics"
+    When I update the product with ID 1 to have the name "Updated Product" and category "Home Appliances"
+    Then the product's name should be "Updated Product"
+    And the product's category should be "Home Appliances"
+    And the product's availability should remain "In Stock"
