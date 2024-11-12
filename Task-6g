@@ -1,0 +1,28 @@
+# features/products.feature
+
+Feature: Product Management
+  As a user
+  I want to search for products based on their name
+  So that I can find specific products quickly
+
+  Scenario: Searching for a product by name
+    Given there are products in the system with various names
+    When I search for a product with the name "Smartphone"
+    Then I should see a product with the name "Smartphone"
+from behave import given, when, then
+from service.models import Product
+
+@given('there are products in the system with various names')
+def step_impl(context):
+    Product.objects.create(name="Smartphone", category="Electronics", price=299.99, availability=True)
+    Product.objects.create(name="Laptop", category="Electronics", price=999.99, availability=True)
+    Product.objects.create(name="T-shirt", category="Clothing", price=19.99, availability=True)
+
+@when('I search for a product with the name "{product_name}"')
+def step_impl(context, product_name):
+    context.product = Product.objects.filter(name=product_name).first()
+
+@then('I should see a product with the name "{product_name}"')
+def step_impl(context, product_name):
+    assert context.product is not None
+    assert context.product.name == product_name
