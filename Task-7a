@@ -1,0 +1,11 @@
+# features/steps/web_steps.py
+
+from behave import when
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+
+@when('I click the "{button_text}" button')
+def step_impl(context, button_text):
+    # Find the button by its text and click it
+    button = context.browser.find_element(By.XPATH, f"//button[text()='{button_text}']")
+    button.click()
