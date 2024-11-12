@@ -1,0 +1,6 @@
+@then('I should not see "{text}" on the page')
+def step_impl(context, text):
+    """
+    Step definition to verify that specific text is not present on the page.
+    """
+    assert text not in context.browser.page_source, f"Unexpected text '{text}' found on the page"
