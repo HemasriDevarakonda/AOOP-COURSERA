@@ -1,0 +1,20 @@
+# features/steps/load_steps.py
+
+from behave import given, before
+from myapp.models import Product  # Import your Product model
+from myapp.factories import ProductFactory  # Assuming you use FactoryBoy for fake data generation
+
+# Load background data before running any scenario
+@before.feature
+def load_background_data(feature, context):
+    """Load background data for the feature, such as creating products"""
+    if feature.name == "Product Management":  # Adjust to match your feature name
+        # Create fake products using ProductFactory
+        ProductFactory.create_batch(5)  # Create 5 fake products
+
+@given('there are products in the database')
+def step_impl(context):
+    """Ensure products are available for the scenario"""
+    if not Product.objects.exists():
+        ProductFactory.create_batch(5)  # Creates 5 products if none exist
+    context.products = Product.objects.all()  # Store products in context to be used in scenarios
