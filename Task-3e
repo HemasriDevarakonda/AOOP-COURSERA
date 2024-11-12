@@ -1,0 +1,31 @@
+# tests/test_routes.py
+
+from rest_framework import status
+from rest_framework.test import APITestCase
+from myapp.models import Product  # Adjust to your actual models
+from tests.factories import ProductFactory
+
+class ProductRoutesTest(APITestCase):
+    def setUp(self):
+        # Create some product instances using the factory
+        ProductFactory(name='Product A')
+        ProductFactory(name='Product B')
+        ProductFactory(name='Product C')
+
+        self.url = '/api/products/?name='  # Adjust to your actual URL pattern for filtering by name
+
+    def test_list_products_by_name(self):
+        # Send a GET request to list products filtered by name 'Product A'
+        response = self.client.get(self.url + 'Product A')
+
+        # Check that the status code is 200 OK
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Check that the response contains the expected product
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['name'], 'Product A')
+
+        # Optionally, check that no other products are returned
+        product_names = [product['name'] for product in response.data]
+        self.assertNotIn('Product B', product_names)
+        self.assertNotIn('Product C', product_names)
