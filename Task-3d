@@ -1,0 +1,30 @@
+# tests/test_routes.py
+
+from rest_framework import status
+from rest_framework.test import APITestCase
+from myapp.models import Product  # Adjust to your actual models
+from tests.factories import ProductFactory
+
+class ProductRoutesTest(APITestCase):
+    def setUp(self):
+        # Create multiple product instances using the factory
+        ProductFactory.create_batch(5)  # Creates 5 products
+
+        self.url = '/api/products/'  # Adjust to your actual URL pattern for listing products
+
+    def test_list_all_products(self):
+        # Send a GET request to list all products
+        response = self.client.get(self.url)
+
+        # Check that the status code is 200 OK
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Check that the response contains the expected number of products
+        self.assertEqual(len(response.data), 5)  # Should return 5 products
+
+        # Optionally, check that the response contains expected product data
+        for product in response.data:
+            self.assertIn('id', product)
+            self.assertIn('name', product)
+            self.assertIn('description', product)
+            self.assertIn('price', product)
