@@ -1,0 +1,41 @@
+# tests/test_routes.py
+
+from rest_framework import status
+from rest_framework.test import APITestCase
+from myapp.models import Product  # Adjust to your actual models
+from tests.factories import ProductFactory
+
+class ProductRoutesTest(APITestCase):
+    def setUp(self):
+        # Create products with different availability statuses
+        ProductFactory(name='Laptop', available=True)  # Product in stock
+        ProductFactory(name='Smartphone', available=False)  # Product out of stock
+        ProductFactory(name='Tablet', available=True)  # Product in stock
+        
+        self.url = '/api/products/?available='  # Adjust to your actual URL pattern for filtering by availability
+
+    def test_list_products_by_availability(self):
+        # Send a GET request to list products filtered by availability (True for in stock)
+        response = self.client.get(self.url + 'true')
+
+        # Check that the status code is 200 OK
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Check that the response contains only products that are in stock
+        self.assertEqual(len(response.data), 2)
+        self.assertTrue(response.data[0]['available'])  # Check if the product is available (in stock)
+        self.assertTrue(response.data[1]['available'])  # Check if the product is available (in stock)
+
+        # Optionally, check that products marked as out of stock are not returned
+        product_availability = [product['available'] for product in response.data]
+        self.assertNotIn(False, product_availability)  # Ensure no products with False (out of stock) are included
+
+        # Send a GET request to list products filtered by availability (False for out of stock)
+        response = self.client.get(self.url + 'false')
+
+        # Check that the status code is 200 OK
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Check that the response contains only products that are out of stock
+        self.assertEqual(len(response.data), 1)
+        self.assertFalse(response.data[0]['available'])  # Ensure product is out of stock
